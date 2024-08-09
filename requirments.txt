@@ -1,0 +1,7 @@
+pandas
+streamlit
+seaborn
+joblib
+catboost
+ipywidgets
+scikit-learn
