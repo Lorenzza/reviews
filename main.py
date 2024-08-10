@@ -6,50 +6,45 @@ import joblib
 import catboost
 import io
 from io import StringIO
-#import test_data  # Импортируем модуль test_data.py 
-
-
-st.header('Какая оценка у отзыва')
+import test  # Импортируем модуль test.py 
 
 LOCAL_PATH = 'data/'
 PATH_DATA = LOCAL_PATH + 'orders.feather'
-PATH_SULITABLE_TEACHERS_DATA = LOCAL_PATH + 'suitable_teachers.feather'
-PATH_TEACHERS_DATA = LOCAL_PATH + 'orders.feather'
-PATH_OUTPUT = 'output/'
+PATH_MODEL = "models/model_cb.pkl"
 
-PATH_UNIQUE_VALUES = 'data/unique_values.json'
-PATH_MODEL = "models/cat_model.sav"
+st.header('Какая оценка у отзыва о телефоне')
 
-@st.cache_data
-def load_data_csv(path):
-    """Load data from path"""
-    data = pd.read_csv(path)#, encoding='Windows-1251')
-    # для демонстрации
-    #data = data.sample(5000)
-    return data
-
-@st.cache_data
-def load_data_feather(path):
-    """Load data from path"""
-    data = pd.read_feather(path)#, encoding='Windows-1251')
-    return data
-
-#@st.cache_data
-uploaded_file = st.file_uploader("Загрузите файл для тестирования orders.csv", 
-                                 type='csv', accept_multiple_files=False)
-if uploaded_file is None:
-    # Значение по умолчанию, которое будет использовано, пока файл не будет загружен
-    orders_test = pd.read_csv(LOCAL_PATH + 'orders_test.csv')
-else:
-# To read file as scv:
-    orders_test = load_data_csv(uploaded_file)
-# Вызываем функцию обработки данных
-    orders_test = test_data.prepare_test_orders(orders_test)
-    st.dataframe(orders_test, height= 300)
-
-@st.cache_data
 def load_model(path):
     """Load model from path"""
     model = joblib.load(path)
     return model
+model = load_model(PATH_MODEL)
 
+
+
+# Поле для ввода текста пользователем
+
+user_input = st.text_input("Введите ваш отзыв в строку ниже и нажмите enter", '')
+if user_input:  # Проверка, что строка не пустая
+    st.write("Ваш отзыв: ")
+    st.write( user_input)
+     # Создание DataFrame
+    test_df = pd.DataFrame([user_input], columns=['Review'])
+    st.write("Лемматизированный отзыв:")
+    #st.dataframe(test_df['Review'], heigh = 300)
+    # Вызываем функцию обработки данных
+    prep_test = test.get_prepared_test_df(test_df)
+    st.write(prep_test['only_text'].iloc[0])
+
+else:
+    st.write("")
+
+
+# Кнопка для запуска процесса цифровой оценки
+if st.button('Узнать оценку'):
+    if user_input:  # Проверка, что строка не пустая
+        st.write("Предсказание оценки пользователя:")
+        preds = model.predict(prep_test)
+        st.write(preds[0])
+    else:
+        st.write("Пожалуйста, введите текст отзыва.")
