@@ -6,7 +6,7 @@ import re
 #testie = "Бомбический аппарат за свои деньги!!! Память, скорость работы, съемка фото\видео, качество материалов корпуса, IP68. Все на высоте. Отличная альтернатива яблокам и самсунгам флагманского уровня. Недостатки за неделю работы пока не обнаружены. Рекомендую к покупке."
 #test_df = pd.DataFrame([testie], columns=['Review'])
 #print(test_df)
-regex = re.compile("[А-ЯЁа-яёA-Za-z!]+")
+regex = re.compile("[А-ЯЁа-яёA-Za-z!\d]+")
 #'only_text', 'len_review', 'num_exclamation_marks' - лучшие фичи для нашей модели. получим их.
 
 def get_rus_words_only(row, regex=regex):
